@@ -1,0 +1,78 @@
+package com.company;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Random;
+
+public class SudokuGameGenerator9 {
+    Random r = new Random();
+    public int matrix[][];
+    SudokuSolutionGenerator9 ssg9;
+
+    SudokuGameGenerator9() {
+        this.matrix = new int[9][9];
+        ssg9 = new SudokuSolutionGenerator9();
+    }
+
+    public void remove(int Number) {
+        int RemovedNumber = Number;                           //Urcuje pocet cislic ktere vymazeme z pole s vyresenym sudoku
+        while (RemovedNumber != 0) {
+            int CellNumber = this.r.nextInt(81);       //Vygeneruje se nahodne cislo od 0-81 a to cislo je cislo policka v 2D poli (CellNumber)
+            int RowNumber = CellNumber / 9;                  //Zjisti radek vygenerovaneho cisla pomoci deleni nahodneho cisla 9 (51/9 = 5)
+            int ColumnNumber = CellNumber % 9;               //Pomoci operace modulo zjisti zbytek po deleni nahodneho cisla 9 (51 % 9 = 6)
+            if (matrix[RowNumber][ColumnNumber] != 0) {      //Policko, ktere ma cislo nahodne vygenerovaneho cila, se prepise na 0
+                matrix[RowNumber][ColumnNumber] = 0;
+                RemovedNumber--;
+            }
+        }
+    }
+
+    private int generateLevel(String difficulty) {      //Tato funkce urcuje jak tezke na vyreseni bude sudoku pomoci mazani bud to vetsiho nebo mensiho poctu cislic z 2D pole se sudoku
+        if (difficulty.equals("Easy")) {
+            return 41 + this.r.nextInt(8);
+        } else if (difficulty.equals("Medium")) {
+            return 49 + this.r.nextInt(8);
+        } else if (difficulty.equals("Hard")) {
+            return 57 + this.r.nextInt(8);
+        } else {
+            return 0;
+        }
+    }
+
+
+    public void generate9(String difficulty) {
+        ssg9.generate9();
+        this.matrix = ssg9.matrix;
+        System.out.println(difficulty);
+        int level = generateLevel(difficulty);      //Program zavola funkci na urceni obtiznosti sudoku ten vrati cislo kolik cisel musi byt odstraneno v zavislosti na tom jakou obtiznost si vybereme
+        remove(level);                              //Potom zavola funkci na odstraneni cisel a ta odstrani urcity pocet cisel
+        print();                                    //Pak se zavola funkce print, ktera jiz hotove sudoku vypise
+    }
+
+    public void print() {
+        JFrame f = new JFrame("Sudoku");
+
+        JLabel board[][] = new JLabel[9][9];//deska obsahuje labels - pole pro text
+        JPanel Board = new JPanel(new GridLayout(9, 9));//zamrdam to do gridLayout
+        for (int i = 0; i < 9; i++) {//prochazime pole od levho horniho rohu
+            for (int j = 0; j < 9; j++) {
+                if (this.matrix[i][j] == 0) {
+                    board[i][j] = new JLabel("");
+                }
+                else {
+                    board[i][j] = new JLabel(String.valueOf(this.matrix[i][j]));//String.valueOf(arr[i][j])//tady se nastavuje hodnota Labelu
+                }
+                    board[i][j].setBorder(BorderFactory.createLineBorder(Color.PINK));//sukam
+                    Font font = new Font("Arial", Font.PLAIN, 20);//???
+                    board[i][j].setFont(font);
+                    board[i][j].setForeground(Color.BLACK);
+                    board[i][j].setBackground(Color.BLACK);
+                    board[i][j].setHorizontalAlignment(JTextField.CENTER);//ig
+                    Board.add(board[i][j]);
+            }
+        }
+        f.add(Board);//pridame to cely na sceny
+        f.setSize(400, 400);
+        f.setVisible(true);
+    }
+}
